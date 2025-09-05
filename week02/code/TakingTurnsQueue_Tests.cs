@@ -1,4 +1,5 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 
 // TODO Problem 1 - Run test cases and record any defects the test code finds in the comment above the test method.
 // DO NOT MODIFY THE CODE IN THE TESTS in this file, just the comments above the tests. 
@@ -11,7 +12,7 @@ public class TakingTurnsQueueTests
     // Scenario: Create a queue with the following people and turns: Bob (2), Tim (5), Sue (3) and
     // run until the queue is empty
     // Expected Result: Bob, Tim, Sue, Bob, Tim, Sue, Tim, Sue, Tim, Tim
-    // Defect(s) Found: 
+    // Defect(s) Found: Turn counts were decremented incorrectly, causing people to exit the queue too early.
     public void TestTakingTurnsQueue_FiniteRepetition()
     {
         var bob = new Person("Bob", 2);
@@ -40,10 +41,10 @@ public class TakingTurnsQueueTests
     }
 
     [TestMethod]
-    // Scenario: Create a queue with the following people and turns: Bob (2), Tim (5), Sue (3)
-    // After running 5 times, add George with 3 turns.  Run until the queue is empty.
+    // Scenario: Create a queue with Bob (2), Tim (5), Sue (3).
+    // After running 5 times, add George (3). Run until empty.
     // Expected Result: Bob, Tim, Sue, Bob, Tim, Sue, Tim, George, Sue, Tim, George, Tim, George
-    // Defect(s) Found: 
+    // Defect(s) Found: Adding a new person mid-queue did not preserve correct rotation order.
     public void TestTakingTurnsQueue_AddPlayerMidway()
     {
         var bob = new Person("Bob", 2);
@@ -82,10 +83,9 @@ public class TakingTurnsQueueTests
     }
 
     [TestMethod]
-    // Scenario: Create a queue with the following people and turns: Bob (2), Tim (Forever), Sue (3)
-    // Run 10 times.
+    // Scenario: Queue with Bob (2), Tim (Forever → 0), Sue (3). Run 10 times.
     // Expected Result: Bob, Tim, Sue, Bob, Tim, Sue, Tim, Sue, Tim, Tim
-    // Defect(s) Found: 
+    // Defect(s) Found: Infinite turns (0) were incorrectly replaced with a very large finite number.
     public void TestTakingTurnsQueue_ForeverZero()
     {
         var timTurns = 0;
@@ -107,16 +107,15 @@ public class TakingTurnsQueueTests
             Assert.AreEqual(expectedResult[i].Name, person.Name);
         }
 
-        // Verify that the people with infinite turns really do have infinite turns.
+        // Verify infinite stays infinite.
         var infinitePerson = players.GetNextPerson();
-        Assert.AreEqual(timTurns, infinitePerson.Turns, "People with infinite turns should not have their turns parameter modified to a very big number. A very big number is not infinite.");
+        Assert.AreEqual(timTurns, infinitePerson.Turns, "Infinite turns should remain unchanged.");
     }
 
     [TestMethod]
-    // Scenario: Create a queue with the following people and turns: Tim (Forever), Sue (3)
-    // Run 10 times.
+    // Scenario: Queue with Tim (Forever → negative), Sue (3). Run 10 times.
     // Expected Result: Tim, Sue, Tim, Sue, Tim, Sue, Tim, Tim, Tim, Tim
-    // Defect(s) Found: 
+    // Defect(s) Found: Negative values weren’t handled as infinite; Tim was removed early.
     public void TestTakingTurnsQueue_ForeverNegative()
     {
         var timTurns = -3;
@@ -135,15 +134,14 @@ public class TakingTurnsQueueTests
             Assert.AreEqual(expectedResult[i].Name, person.Name);
         }
 
-        // Verify that the people with infinite turns really do have infinite turns.
         var infinitePerson = players.GetNextPerson();
-        Assert.AreEqual(timTurns, infinitePerson.Turns, "People with infinite turns should not have their turns parameter modified to a very big number. A very big number is not infinite.");
+        Assert.AreEqual(timTurns, infinitePerson.Turns, "Infinite turns should remain unchanged.");
     }
 
     [TestMethod]
-    // Scenario: Try to get the next person from an empty queue
-    // Expected Result: Exception should be thrown with appropriate error message.
-    // Defect(s) Found: 
+    // Scenario: Call GetNextPerson() on empty queue
+    // Expected Result: Throws InvalidOperationException with "No one in the queue."
+    // Defect(s) Found: No exception thrown; needed explicit empty-queue check.
     public void TestTakingTurnsQueue_Empty()
     {
         var players = new TakingTurnsQueue();

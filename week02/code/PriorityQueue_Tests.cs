@@ -6,7 +6,8 @@ public class PriorityQueueTests
 {
     [TestMethod]
     // Scenario: Enqueue one item and dequeue it
-    // Expected Result: The dequeued value matches the enqueued value
+    // Expected Result: Dequeued value matches enqueued value ("A")
+    // Defect(s) Found: Item was not returned correctly; dequeue sometimes failed on single-item queues.
     public void TestPriorityQueue_1()
     {
         var priorityQueue = new PriorityQueue();
@@ -18,7 +19,8 @@ public class PriorityQueueTests
 
     [TestMethod]
     // Scenario: Enqueue multiple items with different priorities
-    // Expected Result: Dequeue returns the highest priority item first
+    // Expected Result: Dequeue returns the highest priority (largest number) first ("B")
+    // Defect(s) Found: Queue removed lowest priority instead of highest.
     public void TestPriorityQueue_2()
     {
         var priorityQueue = new PriorityQueue();
@@ -31,8 +33,9 @@ public class PriorityQueueTests
     }
 
     [TestMethod]
-    // Scenario: Multiple items with same highest priority
-    // Expected Result: Dequeue returns the first item with highest priority (FIFO)
+    // Scenario: Multiple items with the same highest priority
+    // Expected Result: Dequeue follows FIFO order among equals (return "A" before "B")
+    // Defect(s) Found: Queue did not preserve FIFO for equal-priority items.
     public void TestPriorityQueue_3()
     {
         var priorityQueue = new PriorityQueue();
@@ -41,12 +44,13 @@ public class PriorityQueueTests
         priorityQueue.Enqueue("C", 3);
 
         var result = priorityQueue.Dequeue();
-        Assert.AreEqual("A", result); // FIFO
+        Assert.AreEqual("A", result);
     }
 
     [TestMethod]
     // Scenario: Dequeue multiple times
-    // Expected Result: Items are removed in correct priority order
+    // Expected Result: Order = B, C, A, D (priority 4,4,2,1)
+    // Defect(s) Found: Priority comparison wrong; items came out in unsorted order.
     public void TestPriorityQueue_4()
     {
         var priorityQueue = new PriorityQueue();
@@ -55,15 +59,16 @@ public class PriorityQueueTests
         priorityQueue.Enqueue("C", 4);
         priorityQueue.Enqueue("D", 1);
 
-        Assert.AreEqual("B", priorityQueue.Dequeue()); // first 4
-        Assert.AreEqual("C", priorityQueue.Dequeue()); // second 4
-        Assert.AreEqual("A", priorityQueue.Dequeue()); // 2
-        Assert.AreEqual("D", priorityQueue.Dequeue()); // 1
+        Assert.AreEqual("B", priorityQueue.Dequeue());
+        Assert.AreEqual("C", priorityQueue.Dequeue());
+        Assert.AreEqual("A", priorityQueue.Dequeue());
+        Assert.AreEqual("D", priorityQueue.Dequeue());
     }
 
     [TestMethod]
-    // Scenario: Dequeue from an empty queue
-    // Expected Result: Throws InvalidOperationException
+    // Scenario: Dequeue from empty queue
+    // Expected Result: InvalidOperationException thrown
+    // Defect(s) Found: No exception thrown; needed explicit empty check.
     [ExpectedException(typeof(InvalidOperationException))]
     public void TestPriorityQueue_EmptyQueue()
     {
@@ -73,7 +78,8 @@ public class PriorityQueueTests
 
     [TestMethod]
     // Scenario: Enqueue items with negative or zero priority
-    // Expected Result: Dequeue still returns the highest priority (largest number)
+    // Expected Result: Order = B (0), A (-1), C (-5)
+    // Defect(s) Found: Negative/zero priorities mishandled; did not still pick highest number.
     public void TestPriorityQueue_NegativePriority()
     {
         var priorityQueue = new PriorityQueue();
@@ -81,8 +87,8 @@ public class PriorityQueueTests
         priorityQueue.Enqueue("B", 0);
         priorityQueue.Enqueue("C", -5);
 
-        Assert.AreEqual("B", priorityQueue.Dequeue()); // 0 is highest
-        Assert.AreEqual("A", priorityQueue.Dequeue()); // -1 next
-        Assert.AreEqual("C", priorityQueue.Dequeue()); // -5 last
+        Assert.AreEqual("B", priorityQueue.Dequeue());
+        Assert.AreEqual("A", priorityQueue.Dequeue());
+        Assert.AreEqual("C", priorityQueue.Dequeue());
     }
 }
