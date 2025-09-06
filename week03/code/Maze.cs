@@ -25,14 +25,16 @@ public class Maze
         _mazeMap = mazeMap;
     }
 
-    // TODO Problem 4 - ADD YOUR CODE HERE
     /// <summary>
     /// Check to see if you can move left.  If you can, then move.  If you
     /// can't move, throw an InvalidOperationException with the message "Can't go that way!".
     /// </summary>
     public void MoveLeft()
     {
-        // FILL IN CODE
+        var key = (_currX, _currY);
+        if (!_mazeMap.ContainsKey(key) || !_mazeMap[key][0])
+            throw new InvalidOperationException("Can't go that way!");
+        _currX -= 1;
     }
 
     /// <summary>
@@ -41,7 +43,10 @@ public class Maze
     /// </summary>
     public void MoveRight()
     {
-        // FILL IN CODE
+        var key = (_currX, _currY);
+        if (!_mazeMap.ContainsKey(key) || !_mazeMap[key][1])
+            throw new InvalidOperationException("Can't go that way!");
+        _currX += 1;
     }
 
     /// <summary>
@@ -50,7 +55,10 @@ public class Maze
     /// </summary>
     public void MoveUp()
     {
-        // FILL IN CODE
+        var key = (_currX, _currY);
+        if (!_mazeMap.ContainsKey(key) || !_mazeMap[key][2])
+            throw new InvalidOperationException("Can't go that way!");
+        _currY -= 1;
     }
 
     /// <summary>
@@ -59,7 +67,10 @@ public class Maze
     /// </summary>
     public void MoveDown()
     {
-        // FILL IN CODE
+        var key = (_currX, _currY);
+        if (!_mazeMap.ContainsKey(key) || !_mazeMap[key][3])
+            throw new InvalidOperationException("Can't go that way!");
+        _currY += 1;
     }
 
     public string GetStatus()
